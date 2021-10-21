@@ -92,10 +92,10 @@ class TrainSampler(dgl.dataloading.BlockSampler):
         """
         去掉Label ==1 的边的 节点
         """
-        anomalyEdges=torch.where(g.edata['label']==1)
-        srcNodeIds,dstNodeIds=g.find_edges(anomalyEdges[0].data)
-        g.remove_nodes(srcNodeIds)
-        g.remove_nodes(dstNodeIds)
+        # anomalyEdges=torch.where(g.edata['label']==1)
+        # srcNodeIds,dstNodeIds=g.find_edges(anomalyEdges[0].data)
+        # g.remove_nodes(srcNodeIds)
+        # g.remove_nodes(dstNodeIds)
 
         # if block_id != self.args.n_layer - 1:  # 只要不是最后一层
         #     # 当前层dst的sampletime等于里层src的sample_time

@@ -1,8 +1,8 @@
 import torch
 import numpy as np
 
-def loss_function(nu,data_center,outputs, radius=0,mask=None):
-    dist, scores = anomaly_score(data_center,outputs,radius,mask)
+def loss_function(nu,data_center,outputs,graph, radius=0,mask=None):
+    dist, scores = anomaly_score(data_center,graph,outputs,radius,mask)
     loss = radius**2+(1/nu)*torch.mean(torch.max(torch.zeros_like(scores),scores))
     return loss, dist, scores
 

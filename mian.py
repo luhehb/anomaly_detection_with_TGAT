@@ -7,9 +7,10 @@ import  numpy as np
 from embeding import init_embedding,ATTN
 from time_encode import TimeEncode
 from decoder import  Decoder
-from val_eval import get_current_ts,eval_epoch
+#from val_eval import get_current_ts,eval_epoch
 from loss import  loss_function,get_radius,init_center
-from evaluate import epoch_evaluate
+from evaluate import epoch_evaluate,get_current_ts
+import dgl.function as fn
 
 if __name__ == '__main__':
     args = get_args()
@@ -21,7 +22,10 @@ if __name__ == '__main__':
 
     #设置是否支持 cuda
     device='cuda:0' if torch.cuda.is_available() else 'cpu'
-
+    #初始化节点labels
+    g.update_all(fn.copy_e('label', 'm'), fn.max('m', 'label'))
+    labels = g.ndata['label']
+    #print(labels)
     # 初始化节点feat----图节点无特征数据
     node_feature = torch.zeros((g.number_of_nodes(),args.emb_dimension))
     g.ndata['feat'] = node_feature
@@ -71,6 +75,9 @@ if __name__ == '__main__':
 
             current_ts, pos_ts, num_pos_nodes = get_current_ts(pos_graph)
             pos_graph.ndata['ts'] = current_ts
+            #print(pos_graph.ndata['_ID'].shape[0])
+
+            #print(pos_graph.ndata['label'].shape[0])
 
             # 更新emb
             blocks=emb_updater.forward(blocks)
@@ -78,7 +85,10 @@ if __name__ == '__main__':
             # 获得emb
             emb=blocks[-1].dstdata['h']
 
-            loss,dist,scores = loss_function(args.nu,data_center,emb,radius,mask=None)
+            #print(blocks[0].num_src_nodes)
+            #print(emb.shape[0])
+
+            loss,dist,scores = loss_function(args.nu,data_center,emb,pos_graph,radius,mask=None)
             arr_loss.append(loss.item())
            # print(scores.detach.numpy())
             #print(scores.data.numpy())
@@ -95,7 +105,7 @@ if __name__ == '__main__':
             # loss = loss_fcn(logits, labels)
 
             optimizer.zero_grad()
-            loss.backward()
+           # loss.backward()
             optimizer.step()
 
             radius.data = torch.tensor(get_radius(dist, args.nu), device=device)
