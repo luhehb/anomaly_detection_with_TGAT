@@ -6,7 +6,7 @@ def loss_function(nu,data_center,outputs, radius=0,mask=None):
     loss = radius**2+(1/nu)*torch.mean(torch.max(torch.zeros_like(scores),scores))
     return loss, dist, scores
 
-def anomaly_score(data_center,outputs,radius=0,mask=None):
+def anomaly_score1(data_center,outputs,radius=0,mask=None):
     if mask==None:
         dist = torch.sum((outputs-data_center)**2,dim=1)
     else:
@@ -15,6 +15,22 @@ def anomaly_score(data_center,outputs,radius=0,mask=None):
     scores = dist-radius**2
     return dist, scores
 
+def anomaly_score(data_center,graph,outputs,radius=0,mask=None):
+    labels = graph.ndata['label']
+    ids = graph.ndata['_ID']
+    #scores = torch.tensor([])
+    #dists = torch.tensor([])
+    distList =[]
+    for id,label,emb in zip(ids,labels,outputs):
+        if label==0:
+            dist =torch.sum((emb-data_center)**2,dim=0)
+            #dists=torch.cat((dists,dist))
+            distList.append(dist)
+    dists = torch.tensor(distList)
+    scores = dists-radius**2
+    #print( dists)
+    #print(scores)
+    return dists,scores
 
 
 def init_center(args,blocks,model,eps=0.001):
