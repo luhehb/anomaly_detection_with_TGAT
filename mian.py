@@ -105,7 +105,7 @@ if __name__ == '__main__':
             # loss = loss_fcn(logits, labels)
 
             optimizer.zero_grad()
-           # loss.backward()
+            loss.backward()
             optimizer.step()
 
             radius.data = torch.tensor(get_radius(dist, args.nu), device=device)

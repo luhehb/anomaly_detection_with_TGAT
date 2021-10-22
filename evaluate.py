@@ -66,16 +66,18 @@ def epoch_evaluate(args,g,dataloader,attn,decoder, data_center,radius,device,mas
             blocks = attn.forward(blocks)
             emb = blocks[-1].dstdata['h']
 
-            _,scores = anomaly_score(data_center,emb,radius,mask=None)
-            loss,_,_= loss_function(args.nu,data_center,emb,radius,mask=None)
+            mask= ~labels.bool().squeeze()
+
+            _,scores = anomaly_score(data_center,emb,radius,mask=mask)
+            loss,_,_= loss_function(args.nu,data_center,emb,pos_graph,radius,mask=None)
 
             m_loss.append(loss)
 
             final_scores=np.concatenate((final_scores,scores.numpy()),axis=0)
             final_labels=torch.cat((final_labels,labels),dim=0)
             m_infer_time.append(start)
-    print(final_labels.numpy().shape[0])
-    print(final_scores.shape[0])
+    #print(final_labels.numpy().shape[0])
+    #print(final_scores.shape[0])
     threld =0
     pred=thresholding(final_scores,threld)
     auc=roc_auc_score(final_labels,final_scores)
