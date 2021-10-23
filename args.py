@@ -11,8 +11,8 @@ def get_args():
     parser.add_argument('--tasks', type=str, default="LP", choices=["LP", "EC", "NC"],
                         help='task name link prediction, edge or node classification')
     parser.add_argument('--batch_size', type=int, default=256, help='Batch_size')
-    parser.add_argument('--emb_dimension', type=int, default=100, help='emb_dimension')
-    parser.add_argument('--time_dimension', type=int, default=100, help='dimension of time-encoding')
+    parser.add_argument('--emb_dimension', type=int, default=32, help='emb_dimension')
+    parser.add_argument('--time_dimension', type=int, default=32, help='dimension of time-encoding')
     parser.add_argument('--prefix', type=str, default='TGAT', help='Prefix to name the checkpoints')
     parser.add_argument('--n_degree', type=int, default=20, help='Number of neighbors to sample')
     parser.add_argument('--n_head', type=int, default=2, help='Number of heads used in attention layer')
@@ -27,7 +27,7 @@ def get_args():
     parser.add_argument('--gpu', type=int, default=0, help='Idx for the gpu to use')
     parser.add_argument('--warmup', action='store_true', help='')
     parser.add_argument('--edge_feat_dim', type=int, default=172, help='Dimensions of the edge feature')
-    parser.add_argument('--node_feat_dim', type=int, default=100, help='Dimensions of the node feature')
+    parser.add_argument('--node_feat_dim', type=int, default=32, help='Dimensions of the node feature')
     parser.add_argument('--uniform', action='store_true',
                         help='take uniform sampling from temporal neighbors')
     parser.add_argument('--balance', action='store_true',

@@ -38,14 +38,14 @@ if __name__ == '__main__':
 
     emb_updater = ATTN(args, time_encoder).to(device)
 
-    decoder = Decoder(args, 100)
+    decoder = Decoder(args, args.emb_dimension)
 
     #loss_fcn = torch.nn.BCEWithLogitsLoss().to(device)
     #loss_fcn=loss_function().to(device)
     #建立矩阵存储loss-------到底是多少呢？
 
     #初始化球心
-    data_center = torch.zeros(100)
+    data_center = torch.zeros(args.emb_dimension)
     #初始化半径
     radius=torch.tensor(0)
     #loss_fcn = loss_function(args.nu,data_center,r).to(device)

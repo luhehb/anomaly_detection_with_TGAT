@@ -33,6 +33,7 @@ class ATTN(nn.Module):
     def C_compute(self,edges):
         te_C = self.time_encoder(edges.data['timestamp'] - edges.src['last_update'])
         C = torch.cat([edges.src['h'], edges.data['feat'], te_C], dim=1)
+       # print(C)
         return {'C': C}
 
     def h_compute(self,nodes):
