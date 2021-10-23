@@ -87,8 +87,8 @@ if __name__ == '__main__':
 
             #print(blocks[0].num_src_nodes)
             #print(emb.shape[0])
-
-            loss,dist,scores = loss_function(args.nu,data_center,emb,pos_graph,radius,mask=None)
+            mask = ~pos_graph.ndata['label'].bool().squeeze()
+            loss,dist,scores = loss_function(args.nu,data_center,emb,radius,mask)
             arr_loss.append(loss.item())
            # print(scores.detach.numpy())
             #print(scores.data.numpy())

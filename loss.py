@@ -1,8 +1,8 @@
 import torch
 import numpy as np
 
-def loss_function(nu,data_center,outputs,graph, radius=0,mask=None):
-    mask=~graph.ndata['label'].bool().squeeze()
+def loss_function(nu,data_center,outputs, radius=0,mask=None):
+    #mask=~graph.ndata['label'].bool().squeeze()
     #print(mask)
     dist, scores = anomaly_score(data_center,outputs,radius,mask)
     loss = radius**2+(1/nu)*torch.mean(torch.max(torch.zeros_like(scores),scores))
@@ -10,7 +10,6 @@ def loss_function(nu,data_center,outputs,graph, radius=0,mask=None):
 
 
 def anomaly_score(data_center,outputs,radius=0,mask=None):
-
     if mask==None:
         dist = torch.sum((outputs-data_center)**2,dim=1)
     else:

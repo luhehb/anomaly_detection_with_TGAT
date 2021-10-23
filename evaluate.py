@@ -66,10 +66,10 @@ def epoch_evaluate(args,g,dataloader,attn,decoder, data_center,radius,device,mas
             blocks = attn.forward(blocks)
             emb = blocks[-1].dstdata['h']
 
-            mask= ~labels.bool().squeeze()
+           # mask= ~labels.bool().squeeze()
 
-            _,scores = anomaly_score(data_center,emb,radius,mask=mask)
-            loss,_,_= loss_function(args.nu,data_center,emb,pos_graph,radius,mask=None)
+            _,scores = anomaly_score(data_center,emb,radius,mask=None)
+            loss,_,_= loss_function(args.nu,data_center,emb,radius,mask=None)
 
             m_loss.append(loss)
 
