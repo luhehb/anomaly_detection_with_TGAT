@@ -19,6 +19,11 @@ def anomaly_score(data_center,outputs,radius=0,mask=None):
     return dist, scores
 
 
+def init_center(args,emb,mask):
+    if args.gpu<0:
+        device = torch.device('cpu')
+    else:
+        device = torch.device('cuda:%d'%args.gpu)
 
 
 def init_center(args,blocks,model,eps=0.001):
