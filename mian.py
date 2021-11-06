@@ -140,11 +140,16 @@ if __name__ == '__main__':
         #更新data_center
         with torch.no_grad():
             final_batch_data_center = torch.stack(batch_data_center_list,0)
+            print(final_batch_data_center)
             size= final_batch_data_center.shape[0]
+            print(size)
             single_epoch_data_center= 1/size*torch.sum(final_batch_data_center,dim=0)
+            print(single_epoch_data_center)
             all_epoch_mean.append(single_epoch_data_center)
             epoch_data_center_list= torch.stack(all_epoch_mean,0)
+            print(epoch_data_center_list)
             data_center=(1/(i+1))*torch.sum(epoch_data_center_list,dim=0)
+            print(data_center)
 
 
 
