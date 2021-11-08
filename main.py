@@ -15,13 +15,13 @@ import dgl.function as fn
 if __name__ == '__main__':
     args = get_args()
 
-    g = load_graphs(f"D:\PythonRelation\Dataset\wiki.dgl")[0][0]
+    g = load_graphs("wikipedia.bin")[0][0]
 
     # 边特征维度
     efeat_dim = g.edata['feat'].shape[1]
 
     #设置是否支持 cuda
-    device='cuda:0' if torch.cuda.is_available() else 'cpu'
+    device=torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
     #初始化节点labels
     g.update_all(fn.copy_e('label', 'm'), fn.max('m', 'label'))
     labels = g.ndata['label']
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     epoch_data_center = torch.tensor([])
     all_epoch_mean = []
 
-    data_center =torch.zeros(args.emb_dimension)
+    data_center =torch.zeros(args.emb_dimension).to(device)
     #开始训练
     for i in range(10):
         # 初始化emb
@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
         for batch_id, (input_nodes, pos_graph, neg_graph, blocks, frontier, current_ts) in enumerate(train_loader):
             pos_graph = pos_graph.to(device)
-           # neg_graph = neg_graph.to(device)
+           
             for j in range(args.n_layer):
                 blocks[j] = blocks[j].to(device)
 
@@ -102,7 +102,7 @@ if __name__ == '__main__':
             """
             # 计算当前数据的均值
             size = emb.shape[0]
-            cur_data_center = 1/size*torch.sum(emb,dim=0)
+            cur_data_center = torch.mean(emb,dim=0)
             batch_data_center_list.append(cur_data_center)
             #batch_data_center = torch.cat((batch_data_center,cur_data_center))
             # 如果 epoch 为空 则 datacenter 为当前的 数据中心
@@ -124,11 +124,11 @@ if __name__ == '__main__':
             loss.backward()
             optimizer.step()
             radius.data = torch.tensor(get_radius(dist, args.nu), device=device)
-
+            print(np.mean(arr_loss))
             #更新last_update
             with torch.no_grad():
                 g.ndata['last_update'][pos_graph.ndata[dgl.NID][:num_pos_nodes]] = pos_ts.to('cpu')
-        print(arr_loss)
+        
 
         # 评估验证集
         # val_ap, val_auc, val_acc, val_loss ,time_c= eval_epoch(args,g, val_loader, emb_updater, decoder,
@@ -138,18 +138,18 @@ if __name__ == '__main__':
         ap,auc,acc = epoch_evaluate(args,g,val_loader,emb_updater,decoder,data_center,radius,device,mask=None)
         print("epoch:%d,auc:%f,ap:%f,acc:%f"%(i,auc,ap,acc))
         #更新data_center
-        with torch.no_grad():
-            final_batch_data_center = torch.stack(batch_data_center_list,0)
-            print(final_batch_data_center)
-            size= final_batch_data_center.shape[0]
-            print(size)
-            single_epoch_data_center= 1/size*torch.sum(final_batch_data_center,dim=0)
-            print(single_epoch_data_center)
-            all_epoch_mean.append(single_epoch_data_center)
-            epoch_data_center_list= torch.stack(all_epoch_mean,0)
-            print(epoch_data_center_list)
-            data_center=(1/(i+1))*torch.sum(epoch_data_center_list,dim=0)
-            print(data_center)
+        #with torch.no_grad():
+        # final_batch_data_center = torch.stack(batch_data_center_list,0)
+        # #print(final_batch_data_center)
+        # #size= final_batch_data_center.shape[0]
+        # #print(size)
+        # single_epoch_data_center= torch.mean(final_batch_data_center,dim=0)
+        # #print(single_epoch_data_center)
+        # all_epoch_mean.append(single_epoch_data_center)
+        # epoch_data_center_list= torch.stack(all_epoch_mean,0)
+        # #print(epoch_data_center_list)
+        # data_center=(1/(i+1))*torch.sum(epoch_data_center_list,dim=0)
+            #print(data_center)
 
 
 

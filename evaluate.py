@@ -61,7 +61,7 @@ def epoch_evaluate(args,g,dataloader,attn,decoder, data_center,radius,device,mas
             current_ts,pos_ts,num_pos_nodes = get_current_ts(pos_graph)
             pos_graph.ndata['ts'] = current_ts
             pos_graph.update_all(fn.copy_e('label', 'm'), fn.max('m', 'label'))
-            labels =pos_graph.ndata['label']
+            labels =pos_graph.ndata['label'].cpu()
             start = time.time()
             blocks = attn.forward(blocks)
             emb = blocks[-1].dstdata['h']
@@ -73,7 +73,7 @@ def epoch_evaluate(args,g,dataloader,attn,decoder, data_center,radius,device,mas
 
             m_loss.append(loss)
 
-            final_scores=np.concatenate((final_scores,scores.numpy()),axis=0)
+            final_scores=np.concatenate((final_scores,scores.cpu().numpy()),axis=0)
             final_labels=torch.cat((final_labels,labels),dim=0)
             m_infer_time.append(start)
     #print(final_labels.numpy().shape[0])
