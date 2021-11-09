@@ -15,7 +15,7 @@ class ATTN(nn.Module):
         self.n_head = args.n_head
         self.time_dim = args.time_dimension
         self.node_feat_dim = args.node_feat_dim
-        self.dropout = args.dropout
+        self.dropout = nn.Dropout(p=args.dropout, inplace=True)
         self.args=args
         self.time_encoder=time_encoder
         self.device='cuda:0' if torch.cuda.is_available() else 'cpu'
@@ -27,7 +27,7 @@ class ATTN(nn.Module):
                                                        kdim=self.key_dim,
                                                        vdim=self.key_dim,
                                                        num_heads=self.n_head,
-                                                       dropout=self.dropout).to(self.device))
+                                                       dropout=args.dropout).to(self.device))
             self.mergelayers.append(MergeLayer(self.query_dim, self.node_feat_dim, self.node_feat_dim, self.h_dimension).to(self.device))
 
     def C_compute(self,edges):

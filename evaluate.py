@@ -40,7 +40,7 @@ def epoch_evaluate1(args,g,model,data_center,data,radius,mask):
         f1=f1_score(labels,pred)
     return auc, ap, acc, recall, precision_score,f1
 
-def epoch_evaluate(args,g,dataloader,attn,decoder, data_center,radius,device,mask=None):
+def epoch_evaluate(args,g,dataloader,attn, data_center,radius,device,mask=None):
     #m_ap, m_auc, m_acc =[[],[],[]]
     m_loss =[]
     m_infer_time =[]
@@ -52,7 +52,6 @@ def epoch_evaluate(args,g,dataloader,attn,decoder, data_center,radius,device,mas
     #labels = g.ndata['label']
     with torch.no_grad():
         attn.eval()
-        decoder.eval()
         for batch_idx,(input_nodes,pos_graph,neg_graph,blocks,frontier,current_ts) in enumerate(dataloader):
             pos_graph = pos_graph.to(device)
             for j in range(args.n_layer):
@@ -86,7 +85,6 @@ def epoch_evaluate(args,g,dataloader,attn,decoder, data_center,radius,device,mas
     acc=0
     #print(auc,ap,acc)
     attn.train()
-    decoder.train()
     return ap,auc,acc
 
 

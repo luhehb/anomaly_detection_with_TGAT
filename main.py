@@ -6,7 +6,7 @@ import dgl
 import  numpy as np
 from embedding import init_embedding,ATTN
 from time_encode import TimeEncode
-from decoder import Decoder
+
 #from val_eval import get_current_ts,eval_epoch
 from loss import  loss_function,get_radius,init_center
 from evaluate import epoch_evaluate,get_current_ts
@@ -34,23 +34,21 @@ if __name__ == '__main__':
 
     t0=torch.zeros(g.number_of_nodes())
 
-    time_encoder = TimeEncode(args.time_dimension).to(device)
+    time_encoder = TimeEncode(args.time_dimension, args.dropout).to(device)
 
     emb_updater = ATTN(args, time_encoder).to(device)
-
-    decoder = Decoder(args, args.emb_dimension)
 
     #loss_fcn = torch.nn.BCEWithLogitsLoss().to(device)
     #loss_fcn=loss_function().to(device)
     #建立矩阵存储loss-------到底是多少呢？
 
     #初始化球心
-    data_centerbase = torch.zeros(args.emb_dimension)
+    data_centerbase = torch.zeros(args.emb_dimension).to(device)
     #初始化半径
     radius=torch.tensor(0)
     #loss_fcn = loss_function(args.nu,data_center,r).to(device)
     # 做梯度下降，
-    optimizer = torch.optim.AdamW(list(decoder.parameters())+list(emb_updater.parameters()), lr=args.lr,
+    optimizer = torch.optim.AdamW(list(emb_updater.parameters()), lr=args.lr,
                                  weight_decay=args.weight_decay)
     #记录所有的 epoch 数据的均值
     epoch_data_center = torch.tensor([])
@@ -66,7 +64,6 @@ if __name__ == '__main__':
         g.ndata['last_update'] = t0
         g.ndata['sample_time'] = t0
 
-        decoder.train()
         time_encoder.train()
         emb_updater.train()
 
@@ -135,7 +132,7 @@ if __name__ == '__main__':
         #                                                 loss_fcn, device)#评估验证集
         # print("epoch:%d,loss:%f,ap:%f,time_consume:%f" % (i, val_loss, val_ap, time_c))
 
-        ap,auc,acc = epoch_evaluate(args,g,val_loader,emb_updater,decoder,data_center,radius,device,mask=None)
+        ap,auc,acc = epoch_evaluate(args,g,val_loader,emb_updater,data_center,radius,device,mask=None)
         print("epoch:%d,auc:%f,ap:%f,acc:%f"%(i,auc,ap,acc))
         #更新data_center
         #with torch.no_grad():

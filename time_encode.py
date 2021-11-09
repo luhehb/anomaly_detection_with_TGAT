@@ -4,7 +4,7 @@ import numpy as np
 
 class TimeEncode(nn.Module):
     # time encoding proposed by TGAT
-    def __init__(self, dimension):
+    def __init__(self, dimension, dropout):
         super(TimeEncode, self).__init__()
 
         self.dimension = dimension
@@ -13,6 +13,7 @@ class TimeEncode(nn.Module):
             (torch.from_numpy(1 / 10 ** np.linspace(0, 9, dimension)))  # np.linspace(start,end,num)
             .float().reshape(dimension, -1))  # 这是什么encoding方式？
         self.w.bias = nn.Parameter(torch.zeros(dimension).float())
+        self.dropout = nn.Dropout(p=dropout, inplace=True)
 
     def forward(self, t):
         # t has shape [batch_size, seq_len]
