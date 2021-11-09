@@ -19,7 +19,8 @@ class TimeEncode(nn.Module):
         # t has shape [batch_size, seq_len]
         # Add dimension at the end to apply linear layer --> [batch_size, seq_len, 1]
         t = t.unsqueeze(dim=1)
-
+        t = self.w(t)
+        t = self.dropout(t)
         # output has shape [bs,seq_len,dimension]
-        output = torch.cos(self.w(t))
+        output = torch.cos(t)
         return output

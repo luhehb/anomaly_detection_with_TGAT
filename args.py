@@ -20,7 +20,7 @@ def get_args():
     parser.add_argument('--n_layer', type=int, default=2, help='Number of network layers')
     parser.add_argument('--n_worker', type=int, default=0, help='Number of network layers')
     parser.add_argument('--lr', type=float, default=5e-3, help='Learning rate')
-    parser.add_argument('--weight_decay', type=float, default=1e-5, help='weight_decay')
+    parser.add_argument('--weight_decay', type=float, default=1e-2, help='weight_decay')
     parser.add_argument('--seed', type=int, default=-1, help='Random Seed')
     parser.add_argument('--patience', type=int, default=5, help='Patience for early stopping')
     parser.add_argument('--dropout', type=float, default=0.1, help='Dropout probability')

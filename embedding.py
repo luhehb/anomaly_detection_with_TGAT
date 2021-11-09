@@ -15,7 +15,6 @@ class ATTN(nn.Module):
         self.n_head = args.n_head
         self.time_dim = args.time_dimension
         self.node_feat_dim = args.node_feat_dim
-        self.dropout = nn.Dropout(p=args.dropout, inplace=True)
         self.args=args
         self.time_encoder=time_encoder
         self.device='cuda:0' if torch.cuda.is_available() else 'cpu'
@@ -28,7 +27,7 @@ class ATTN(nn.Module):
                                                        vdim=self.key_dim,
                                                        num_heads=self.n_head,
                                                        dropout=args.dropout).to(self.device))
-            self.mergelayers.append(MergeLayer(self.query_dim, self.node_feat_dim, self.node_feat_dim, self.h_dimension).to(self.device))
+            self.mergelayers.append(MergeLayer(self.query_dim, self.node_feat_dim, self.node_feat_dim, self.h_dimension, args.dropout).to(self.device))
 
     def C_compute(self,edges):
         te_C = self.time_encoder(edges.data['timestamp'] - edges.src['last_update'])
@@ -61,17 +60,21 @@ class ATTN(nn.Module):
 class MergeLayer(torch.nn.Module):
     '''(dim1+dim2)->dim3->dim4'''
 
-    def __init__(self, dim1, dim2, dim3, dim4):
+    def __init__(self, dim1, dim2, dim3, dim4, dropout):
         super().__init__()
         self.fc1 = torch.nn.Linear(dim1 + dim2, dim3)
         self.fc2 = torch.nn.Linear(dim3, dim4)
         self.act = torch.nn.ReLU()
+        self.dropout = nn.Dropout(p=dropout, inplace=True)
 
         torch.nn.init.xavier_normal_(self.fc1.weight)
         torch.nn.init.xavier_normal_(self.fc2.weight)
 
     def forward(self, x1, x2):
-        x = torch.cat([x1, x2], dim=1)
-        h = self.act(self.fc1(x))
+        h = torch.cat([x1, x2], dim=1)
+        #加dropout效果不好
+        #h = self.dropout(h)
+        h = self.act(self.fc1(h))
+        #h = self.dropout(h)
         return self.fc2(h)
 
