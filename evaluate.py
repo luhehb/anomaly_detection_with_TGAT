@@ -84,7 +84,7 @@ def epoch_evaluate(args,g,dataloader,attn,decoder, data_center,radius,device,mas
     ap=average_precision_score(final_labels,final_scores)
     #acc= accuracy_score(labels,pred)
     acc=0
-    print(auc,ap,acc)
+    #print(auc,ap,acc)
     attn.train()
     decoder.train()
     return ap,auc,acc

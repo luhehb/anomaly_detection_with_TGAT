@@ -50,7 +50,7 @@ if __name__ == '__main__':
     radius=torch.tensor(0)
     #loss_fcn = loss_function(args.nu,data_center,r).to(device)
     # 做梯度下降，
-    optimizer = torch.optim.Adam(list(decoder.parameters())+list(emb_updater.parameters()), lr=args.lr,
+    optimizer = torch.optim.AdamW(list(decoder.parameters())+list(emb_updater.parameters()), lr=args.lr,
                                  weight_decay=args.weight_decay)
     #记录所有的 epoch 数据的均值
     epoch_data_center = torch.tensor([])
@@ -124,12 +124,12 @@ if __name__ == '__main__':
             loss.backward()
             optimizer.step()
             radius.data = torch.tensor(get_radius(dist, args.nu), device=device)
-            print(np.mean(arr_loss))
+            #print(np.mean(arr_loss))
             #更新last_update
             with torch.no_grad():
                 g.ndata['last_update'][pos_graph.ndata[dgl.NID][:num_pos_nodes]] = pos_ts.to('cpu')
         
-
+        print(np.mean(arr_loss))
         # 评估验证集
         # val_ap, val_auc, val_acc, val_loss ,time_c= eval_epoch(args,g, val_loader, emb_updater, decoder,
         #                                                 loss_fcn, device)#评估验证集
